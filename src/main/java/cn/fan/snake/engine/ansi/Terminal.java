@@ -21,6 +21,15 @@ public class Terminal {
     }
 
     /**
+     * 将光标向下移动
+     * @param row 行
+     */
+    public static void moveDown(int row){
+        String position = String.format("\u001B[%dB",row);
+        System.out.print(position);
+    }
+
+    /**
      * 清除
      */
     public static void cleanScreen(){
