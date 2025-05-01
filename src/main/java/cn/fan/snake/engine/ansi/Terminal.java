@@ -1,11 +1,11 @@
 package cn.fan.snake.engine.ansi;
 
 /**
- * ANSI工具类
+ * Terminal终端控制台类
  *
  * @author Fan
  */
-public class AnsiTool {
+public class Terminal {
 
     // 重置样式
     public static final String RESET = "\u001B[0m";
@@ -39,5 +39,12 @@ public class AnsiTool {
      */
     public static void showCursor(){
         System.out.print("\033[?25h");
+    }
+
+    /**
+     * 重置样式
+     */
+    public static void reset(){
+        System.out.print("\u001B[0m");
     }
 }
