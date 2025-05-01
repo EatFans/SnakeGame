@@ -1,4 +1,4 @@
-package cn.fan.snake.engine;
+package cn.fan.snake.ui;
 
 import cn.fan.snake.engine.ansi.BackColor;
 import cn.fan.snake.engine.ansi.ForeColor;
