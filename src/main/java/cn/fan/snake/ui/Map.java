@@ -2,7 +2,6 @@ package cn.fan.snake.ui;
 
 import cn.fan.snake.engine.ansi.BackColor;
 import cn.fan.snake.engine.ansi.ForeColor;
-import cn.fan.snake.ui.UI;
 
 public class Map extends UI {
 
