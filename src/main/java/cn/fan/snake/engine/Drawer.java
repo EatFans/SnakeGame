@@ -39,4 +39,17 @@ public class Drawer {
         Terminal.moveTo(row,col);
         System.out.print(color + bgColor + content);
     }
+
+    /**
+     * 绘制文本
+     * @param row 行
+     * @param col 列
+     * @param color 颜色
+     * @param text 文本
+     */
+    public void drawText(int row, int col, String color, String text){
+        Terminal.moveTo(row,col);
+        System.out.print(color + text);
+        Terminal.reset();
+    }
 }
