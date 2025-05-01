@@ -39,6 +39,6 @@ public class Logger {
     public static void error(String message){
         Terminal.moveTo(row,col);
         System.out.print(ForeColor.RED+message);
-        Terminal.cleanScreen();
+        Terminal.reset();
     }
 }
