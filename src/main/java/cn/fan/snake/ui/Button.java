@@ -60,6 +60,14 @@ public class Button extends UI{
         this.isSelected = false;
     }
 
+    /**
+     * 按钮是否启用
+     * @return boolean
+     */
+    public boolean isEnable() {
+        return isEnable;
+    }
+
     public void setEnable(boolean flag){
         this.isEnable = flag;
     }
