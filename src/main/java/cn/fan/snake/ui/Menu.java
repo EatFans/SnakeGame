@@ -37,7 +37,7 @@ public class Menu extends UI{
         drawer.drawText(realRow+2,22*2,ForeColor.YELLOW,"得分：");
         drawer.drawText(realRow+4,22*2,ForeColor.GREEN,"长度：");
         drawer.drawText(realRow+6,22*2,ForeColor.PURPLE,"输入：");
-        drawer.drawText(realRow+8,22*2,ForeColor.RED,"FPS：");
+        drawer.drawText(realRow+8,22*2,ForeColor.RED,"速度：");
 
 
     }
