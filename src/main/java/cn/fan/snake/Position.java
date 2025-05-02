@@ -35,4 +35,20 @@ public class Position {
     public int getRow(){
         return y;
     }
+
+    /**
+     * 获取游戏二维x位置
+     * @return x位置
+     */
+    public int getX() {
+        return x;
+    }
+
+    /**
+     * 获取游戏二维y位置
+     * @return y位置
+     */
+    public int getY() {
+        return y;
+    }
 }
