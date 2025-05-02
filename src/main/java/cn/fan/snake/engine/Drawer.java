@@ -26,6 +26,17 @@ public class Drawer {
         Terminal.reset();
     }
 
+    /**
+     * 绘制内容
+     * @param row 行
+     * @param col 列
+     * @param content 内容
+     */
+    public void draw(int row, int col,String content){
+        Terminal.moveTo(row,col);
+        System.out.print(content);
+        Terminal.reset();
+    }
 
     /**
      * 安全绘制，保证不会破坏已经绘制好的内容
