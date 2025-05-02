@@ -35,6 +35,8 @@ public class Snake extends Entity {
         // 清除body之前的数据
         body.clear();
 
+        direction = Direction.RIGHT;
+
         // 添加蛇头位置数据
         Position head = new Position(x, y);
         body.add(head);
@@ -193,4 +195,6 @@ public class Snake extends Entity {
     public Direction getDirection(){
         return direction;
     }
+
+
 }

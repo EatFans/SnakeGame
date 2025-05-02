@@ -81,8 +81,8 @@ public class GameManager {
         // 游戏主循环
         while (isRunning){
 
-            update();
             processInput();
+            update();
             render();
 
         }
@@ -220,23 +220,27 @@ public class GameManager {
                 switch (Character.toLowerCase(c)){
                     case 'w':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "W");
-                        if (snake.getDirection() != Direction.DOWN)
-                            snake.setDirection(Direction.UP);
+                        if (gameStatus == GameStatus.STARTING)
+                            if (snake.getDirection() != Direction.DOWN)
+                                snake.setDirection(Direction.UP);
                         break;
                     case 's':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "S");
-                        if (snake.getDirection() != Direction.UP)
-                            snake.setDirection(Direction.DOWN);
+                        if (gameStatus == GameStatus.STARTING)
+                            if (snake.getDirection() != Direction.UP)
+                                snake.setDirection(Direction.DOWN);
                         break;
                     case 'a':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "A");
-                        if (snake.getDirection() != Direction.RIGHT)
-                            snake.setDirection(Direction.LEFT);
+                        if (gameStatus == GameStatus.STARTING)
+                            if (snake.getDirection() != Direction.RIGHT)
+                                snake.setDirection(Direction.LEFT);
                         break;
                     case 'd':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "D");
-                        if (snake.getDirection() != Direction.LEFT)
-                            snake.setDirection(Direction.RIGHT);
+                        if (gameStatus == GameStatus.STARTING)
+                            if (snake.getDirection() != Direction.LEFT)
+                                snake.setDirection(Direction.RIGHT);
                         break;
                     case '1':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "1");
@@ -277,7 +281,8 @@ public class GameManager {
                             // 开始游戏被选择确定后，把游戏状态设置为开始状态
                             gameStatus = GameStatus.STARTING;
                         } else if (currentSelectButton == 2) {
-
+                            Logger.info("重新开始游戏");
+                            restartGame();
                         }
                         break;
                     default:
@@ -366,7 +371,7 @@ public class GameManager {
         int col = position.getCol();
 
         // 确保边界检测准确
-        return row <= 0 || row >= this.row - 1 || col <= 0 || col >= this.col - 2;
+        return row <= 0 || row >= this.row - 1 || col <= 0 || col >= this.col - 1;
     }
 
     private void gameOver(){
@@ -385,5 +390,26 @@ public class GameManager {
     private void restartGame(){
         this.score = 0;
 
+        Map map = null;
+        Menu menu = null;
+        for (UI ui : uis){
+            if (ui instanceof Map)
+                map =(Map) ui;
+            if (ui instanceof Menu)
+                menu = (Menu) ui;
+        }
+
+        map.draw();
+        menu.draw();
+
+        // 清理游戏区域渲染
+        drawer.clearDraw(2,3,this.row-1,this.col-2);
+
+        initSnake();
+
+        // TODO: 待完成
+
+
     }
+
 }
