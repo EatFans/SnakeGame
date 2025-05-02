@@ -185,4 +185,12 @@ public class Snake extends Entity {
         }
         return false;
     }
+
+    /**
+     * 获取蛇的方向
+     * @return 方向
+     */
+    public Direction getDirection(){
+        return direction;
+    }
 }

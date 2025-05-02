@@ -213,19 +213,23 @@ public class GameManager {
                 switch (Character.toLowerCase(c)){
                     case 'w':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "W");
-                        snake.setDirection(Direction.UP);
+                        if (snake.getDirection() != Direction.DOWN)
+                            snake.setDirection(Direction.UP);
                         break;
                     case 's':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "S");
-                        snake.setDirection(Direction.DOWN);
+                        if (snake.getDirection() != Direction.UP)
+                            snake.setDirection(Direction.DOWN);
                         break;
                     case 'a':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "A");
-                        snake.setDirection(Direction.LEFT);
+                        if (snake.getDirection() != Direction.RIGHT)
+                            snake.setDirection(Direction.LEFT);
                         break;
                     case 'd':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "D");
-                        snake.setDirection(Direction.RIGHT);
+                        if (snake.getDirection() != Direction.LEFT)
+                            snake.setDirection(Direction.RIGHT);
                         break;
                     case '1':
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "1");
