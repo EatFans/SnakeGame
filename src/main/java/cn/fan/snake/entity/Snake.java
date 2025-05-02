@@ -169,4 +169,20 @@ public class Snake extends Entity {
     public int getLength(){
         return length;
     }
+
+    /**
+     * 检查蛇是否撞到自己
+     * @return 如果撞到自己就返回true，否则就返回false
+     */
+    public boolean checkCollisionWhiSelf(){
+        Position head = getHead();
+
+        // 从第二节点开始检查（跳过头部）
+        for (int i = 1; i < body.size(); i++){
+            Position segment = body.get(i);
+            if (head.getX() == segment.getX() && head.getY() == segment.getY())
+                return true;
+        }
+        return false;
+    }
 }

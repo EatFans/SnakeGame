@@ -23,7 +23,6 @@ public class Map extends UI {
             for (int j = 1; j <= col; j++) {
                 // 判断是否在边框位置
                 if (i == 1 || i == row || j == 1 || j == col) {
-                    // 计算列的正确位置，每个方块占两个字符
                     drawer.draw(i, j, ForeColor.WHITE, BackColor.WHITE, "　");
                 }
             }
