@@ -14,4 +14,5 @@ public class ForeColor {
     public static final String PURPLE = "\u001B[35m";
     public static final String CYAN = "\u001B[90m";
     public static final String WHITE = "\u001B[37m";
+    public static final String LIGHT_GREEN = "\u001B[48;5;51m";
 }

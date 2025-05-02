@@ -15,4 +15,5 @@ public class BackColor {
     public static final String PURPLE = "\u001B[45m";
     public static final String CYAN = "\u001B[46m";
     public static final String WHITE = "\u001B[47m";
+    public static final String LIGHT_GREEN = "\u001B[48;5;51m";
 }
