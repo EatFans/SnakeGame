@@ -5,7 +5,7 @@ package cn.fan.snake;
  */
 public enum GameStatus {
     MENU(2),    // 还未开始在菜单选择中
-    RUNNING(1), // 游戏进行中
+    STARTING(1), // 游戏进行中
     GAME_OVER(0); // 游戏结束
 
     private final int status;
