@@ -183,23 +183,30 @@ public class GameManager {
      * 更新逻辑
      */
     public void update(){
-        // 检查蛇是否撞到边界
-        if (checkCollisionWithBoundary()){
-            gameOver();
-        }
-
-
         if (gameStatus == GameStatus.STARTING){
+            // 获取蛇头的当前位置
+            Position head = snake.getHead();
+            Position nextHead = getNextHeadPosition(head);
+
+            // 在移动前检查碰撞
+            if (checkCollisionWithBoundary(nextHead)) {
+                // 游戏结束
+                gameOver();
+                return;
+            }
+
+            // 检查是否撞到自己
+            if (snake.checkCollisionWhiSelf()) {
+                gameOver();
+                return;
+            }
             snake.move();
         }
 
-        // 检查蛇是否撞到自己
-        if (snake.checkCollisionWhiSelf()){
-            gameOver();
-        }
 
 
     }
+
 
 
     /**
@@ -335,14 +342,31 @@ public class GameManager {
     }
 
     /**
-     * 检查蛇是否撞到地图边界
-     * @return 如果撞到边界就返回true，否则就返回false
+     * 获取蛇头的下一个位置
      */
-    private boolean checkCollisionWithBoundary(){
-        Position head = snake.getHead();
-        int row = head.getRow();
-        int col = head.getCol();
-        return row < 1 || row >= this.row || col < 2 || col >= this.col;
+    private Position getNextHeadPosition(Position head) {
+        Direction direction = snake.getDirection();
+        int x = head.getX();
+        int y = head.getY();
+
+        return switch (direction) {
+            case UP -> new Position(x - 1, y);
+            case DOWN -> new Position(x + 1, y);
+            case LEFT -> new Position(x, y - 1);
+            case RIGHT -> new Position(x, y + 1);
+            default -> head;
+        };
+    }
+
+    /**
+     * 检查指定位置是否撞到地图边界
+     */
+    private boolean checkCollisionWithBoundary(Position position) {
+        int row = position.getRow();
+        int col = position.getCol();
+
+        // 确保边界检测准确
+        return row <= 0 || row >= this.row - 1 || col <= 0 || col >= this.col - 2;
     }
 
     private void gameOver(){
