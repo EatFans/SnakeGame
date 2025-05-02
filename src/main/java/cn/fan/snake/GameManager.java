@@ -26,6 +26,7 @@ public class GameManager {
     private int col;
     private int score;  // 当前得分
     private int length; // 当前蛇的长度
+    private int currentFPS; // 当前fps
     private boolean isRunning;
     private GameStatus gameStatus; // 游戏状态
     private Button startGameButton; // 开始游戏按钮
@@ -76,7 +77,8 @@ public class GameManager {
      */
     private void init(){
         this.score = 0;
-        this.length = 2;
+        this.length = 3;
+        this.currentFPS = 0;
         this.isRunning = true; // 游戏循环是否运行
         this.gameStatus = GameStatus.MENU; // 初始化游戏状态
 
@@ -220,6 +222,12 @@ public class GameManager {
         // 得分、长度、fps数值动态渲染
         String score = String.format("%d",this.score);
         drawer.drawText(row+2,25*2,ForeColor.WHITE, score);
+
+        String length = String.format("%d",this.length);
+        drawer.drawText(row+4, 25*2,ForeColor.WHITE,length);
+
+        String fps = String.format("%d",this.currentFPS);
+        drawer.drawText(row+8,25*2,ForeColor.WHITE,fps);
 
         // 如果游戏状态在菜单，去动态实时渲染按钮
         if (gameStatus == GameStatus.MENU){
