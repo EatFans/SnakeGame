@@ -39,12 +39,6 @@ public class Button extends UI{
         }
     }
 
-    /**
-     * 点击按钮
-     */
-    public void onClick(){
-
-    }
 
     /**
      * 选择按钮
