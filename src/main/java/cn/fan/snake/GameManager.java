@@ -2,12 +2,14 @@ package cn.fan.snake;
 
 import cn.fan.snake.engine.Drawer;
 import cn.fan.snake.engine.Logger;
+import cn.fan.snake.ui.Button;
 import cn.fan.snake.ui.Map;
-import cn.fan.snake.engine.ansi.BackColor;
 import cn.fan.snake.engine.ansi.ForeColor;
 import cn.fan.snake.engine.ansi.Terminal;
 import cn.fan.snake.ui.Menu;
 import cn.fan.snake.ui.UI;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.NonBlockingReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,17 @@ public class GameManager {
     private int score;  // 当前得分
     private int length; // 当前蛇的长度
     private boolean isRunning;
+    private GameStatus gameStatus; // 游戏状态
+    private Button startGameButton; // 开始游戏按钮
+    private Button restartGameButton; // 开始游戏按钮
+    private int currentSelectButton;
 
     private final Drawer drawer;
     private final List<UI> uis = new ArrayList<>();
+
+    // jline库中的输入控制的类
+    private org.jline.terminal.Terminal terminal;
+    private NonBlockingReader reader;
 
     public GameManager(int row, int col){
         this.row = row;
@@ -37,6 +47,10 @@ public class GameManager {
 
         uis.add(new Map(this.row,this.col));
         uis.add(new Menu(this.row+ROW_COUNT,this.col,ROW_COUNT));
+        // 按钮创建对象
+        startGameButton = new Button(this.row+6,3*2,"开始游戏");
+        restartGameButton = new Button(this.row+6,13*2,"重新开始");
+
     }
 
     public void run(){
@@ -46,7 +60,7 @@ public class GameManager {
         // 游戏主循环
         while (isRunning){
 
-            drawer.draw(8,10,ForeColor.GREEN, BackColor.GREEN, "　");
+            processInput();
             render();
 
         }
@@ -54,6 +68,8 @@ public class GameManager {
         if (!isRunning){
 
         }
+
+        cleanup();
     }
     /**
      * 游戏初始化
@@ -61,7 +77,26 @@ public class GameManager {
     private void init(){
         this.score = 0;
         this.length = 2;
-        this.isRunning = true;
+        this.isRunning = true; // 游戏循环是否运行
+        this.gameStatus = GameStatus.MENU; // 初始化游戏状态
+
+        // 默认选择开始游戏按钮
+        currentSelectButton = 1;
+        startGameButton.onSelect();
+        // 禁用重新开始按钮
+        restartGameButton.setEnable(false);
+
+        try {
+            // 初始化终端
+            terminal = TerminalBuilder.builder()
+                    .system(true)
+                    .jansi(true)
+                    .build();
+            reader = terminal.reader();
+            terminal.enterRawMode();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         initUI();
 
@@ -78,6 +113,8 @@ public class GameManager {
         for (UI ui : uis){
             ui.setDrawer(this.drawer);
         }
+        startGameButton.setDrawer(this.drawer);
+        restartGameButton.setDrawer(this.drawer);
 
         Map map = null;
         Menu menu = null;
@@ -98,6 +135,9 @@ public class GameManager {
 
         map.draw();
         menu.draw();
+
+        startGameButton.draw();
+        restartGameButton.draw();
     }
 
     /**
@@ -111,7 +151,66 @@ public class GameManager {
      * 处理输入
      */
     public void processInput(){
+        try {
+            int input = reader.read(1);
+            if (input != -1){
+                char c = (char) input;
+                switch (Character.toLowerCase(c)){
+                    case 'w':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "W");
+                        break;
+                    case 's':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "S");
+                        break;
+                    case 'a':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "A");
+                        break;
+                    case 'd':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "D");
+                        break;
+                    case '1':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "1");
+                        if (gameStatus == GameStatus.MENU){
+                            // 检查startGameButton是否启用
+                            if (startGameButton.isEnable()){
+                                currentSelectButton = 1;
+                                startGameButton.onSelect();
+                                restartGameButton.onDeselect();
+                            } else {
+                                currentSelectButton = 2;
+                                restartGameButton.onSelect();
+                                startGameButton.onDeselect();
+                            }
 
+                        }
+                        break;
+                    case '2':
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE,"2");
+                        if (gameStatus == GameStatus.MENU){
+                            // 检查restartGameButton是否启用
+                            if (restartGameButton.isEnable()){
+                                currentSelectButton = 2;
+                                startGameButton.onDeselect();
+                                restartGameButton.onSelect();
+                            } else {
+                                currentSelectButton = 1;
+                                startGameButton.onSelect();
+                                restartGameButton.onDeselect();
+                            }
+
+                        }
+                        break;
+                    case 13:
+                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "↵");
+                        Logger.warn("当前选择的按钮为 "+currentSelectButton);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -120,6 +219,24 @@ public class GameManager {
     public void render(){
         // 得分、长度、fps数值动态渲染
         String score = String.format("%d",this.score);
-        drawer.drawText(row+3,25*2,ForeColor.WHITE, score);
+        drawer.drawText(row+2,25*2,ForeColor.WHITE, score);
+
+        // 如果游戏状态在菜单，去动态实时渲染按钮
+        if (gameStatus == GameStatus.MENU){
+            startGameButton.draw();
+            restartGameButton.draw();
+        }
+    }
+
+    /**
+     * 清理终端输入
+     */
+    public void cleanup() {
+        try {
+            // 关闭终端
+            terminal.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
