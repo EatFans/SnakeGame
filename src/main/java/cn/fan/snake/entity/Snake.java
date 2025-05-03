@@ -196,5 +196,41 @@ public class Snake extends Entity {
         return direction;
     }
 
+    /**
+     * 让蛇增长一节
+     */
+    public void grow() {
+        // 增加蛇的长度属性
+        length++;
+
+        // 获取当前尾部节点
+        Position tail = getTail();
+
+        // 根据尾部和倒数第二个节点的位置关系，确定新尾部的位置
+        if (body.size() >= 2) {
+            Position beforeTail = body.get(body.size() - 2);
+            int dx = tail.getX() - beforeTail.getX();
+            int dy = tail.getY() - beforeTail.getY();
+
+            // 在尾部后面添加一个新节点
+            body.add(new Position(tail.getX() + dx, tail.getY() + dy));
+        } else {
+            // 如果蛇只有一个节点，根据方向添加
+            switch (direction) {
+                case UP:
+                    body.add(new Position(tail.getX(), tail.getY() + 1));
+                    break;
+                case DOWN:
+                    body.add(new Position(tail.getX(), tail.getY() - 1));
+                    break;
+                case LEFT:
+                    body.add(new Position(tail.getX() + 1, tail.getY()));
+                    break;
+                case RIGHT:
+                    body.add(new Position(tail.getX() - 1, tail.getY()));
+                    break;
+            }
+        }
+    }
 
 }
