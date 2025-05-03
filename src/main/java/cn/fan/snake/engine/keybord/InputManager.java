@@ -16,10 +16,6 @@ public class InputManager {
     private final Map<Character, Method> keyHandlerMethods = new HashMap<>();
     private final Map<Character, KeyListener> keyHandlerInstances = new HashMap<>();
 
-    public InputManager(){
-
-    }
-
     /**
      * 注册监听器
      * @param name 名字

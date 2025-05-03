@@ -173,6 +173,15 @@ public class Snake extends Entity {
     }
 
     /**
+     * 获取蛇的方向
+     * @return 方向
+     */
+    public Direction getDirection(){
+        return direction;
+    }
+
+
+    /**
      * 检查蛇是否撞到自己
      * @return 如果撞到自己就返回true，否则就返回false
      */
@@ -189,14 +198,6 @@ public class Snake extends Entity {
     }
 
     /**
-     * 获取蛇的方向
-     * @return 方向
-     */
-    public Direction getDirection(){
-        return direction;
-    }
-
-    /**
      * 让蛇增长一节
      */
     public void grow() {
@@ -205,7 +206,6 @@ public class Snake extends Entity {
 
         // 获取当前尾部节点
         Position tail = getTail();
-
         // 根据尾部和倒数第二个节点的位置关系，确定新尾部的位置
         if (body.size() >= 2) {
             Position beforeTail = body.get(body.size() - 2);

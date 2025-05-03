@@ -333,7 +333,7 @@ public class GameManager {
             // x是 3 ~ 29 之间生成
             // y是 2 ～ 27 之间生成  (PS：在底部边框刷新食物，可能出现bug，懒得修，直接在2～27以上生成）
             foodX = random.nextInt( 29 - 3 + 1) + 3;
-            foodY = random.nextInt(27 - 2 + 1) + 2;
+            foodY = random.nextInt(26 - 2 + 1) + 2;
 
             // 检查位置是否有效（不在蛇身上）
             validPosition = true;
@@ -393,7 +393,7 @@ public class GameManager {
         int col = position.getCol();
 
         // 确保边界检测准确
-        return row <= 0 || row >= this.row - 1 || col <= 0 || col >= this.col - 1;
+        return row < 1 || row >= this.row - 1  || col <= 0 || col >= this.col - 1;
     }
 
     /**
