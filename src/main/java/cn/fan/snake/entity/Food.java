@@ -12,8 +12,8 @@ import cn.fan.snake.engine.ansi.ForeColor;
 public class Food extends Entity{
     private Position position;
 
-    public Food(int x, int y){
-        position = new Position(x,y);
+    public Food(){
+        position = new Position(5,10);
     }
 
     /**
