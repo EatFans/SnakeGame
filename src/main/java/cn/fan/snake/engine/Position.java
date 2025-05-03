@@ -1,4 +1,4 @@
-package cn.fan.snake;
+package cn.fan.snake.engine;
 
 /**
  * 坐标类，来标识二维坐标

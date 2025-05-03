@@ -1,6 +1,6 @@
 package cn.fan.snake.entity;
 
-import cn.fan.snake.Position;
+import cn.fan.snake.engine.Position;
 import cn.fan.snake.engine.ansi.BackColor;
 import cn.fan.snake.engine.ansi.ForeColor;
 

@@ -1,4 +1,4 @@
-package cn.fan.snake;
+package cn.fan.snake.engine;
 
 /**
  * 方向枚举

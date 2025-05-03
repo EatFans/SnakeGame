@@ -1,7 +1,9 @@
 package cn.fan.snake;
 
+import cn.fan.snake.engine.Direction;
 import cn.fan.snake.engine.Drawer;
 import cn.fan.snake.engine.Logger;
+import cn.fan.snake.engine.Position;
 import cn.fan.snake.engine.ansi.BackColor;
 import cn.fan.snake.entity.Food;
 import cn.fan.snake.entity.Snake;
@@ -222,8 +224,6 @@ public class GameManager {
 
 
     }
-
-
 
     /**
      * 处理输入
