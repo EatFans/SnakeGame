@@ -5,8 +5,12 @@ import cn.fan.snake.engine.Drawer;
 import cn.fan.snake.engine.Logger;
 import cn.fan.snake.engine.Position;
 import cn.fan.snake.engine.ansi.BackColor;
+import cn.fan.snake.engine.keybord.InputManager;
 import cn.fan.snake.entity.Food;
 import cn.fan.snake.entity.Snake;
+import cn.fan.snake.listener.GameKeyListener;
+import cn.fan.snake.listener.MenuKeyListener;
+import cn.fan.snake.listener.MoveKeyListener;
 import cn.fan.snake.ui.Button;
 import cn.fan.snake.ui.Map;
 import cn.fan.snake.engine.ansi.ForeColor;
@@ -28,8 +32,8 @@ import java.util.Random;
 public class GameManager {
     private final int ROW_COUNT = 10;
     // 地图每个格子的坐标
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
     private int score;  // 当前得分
     private int length; // 当前蛇的长度
     private final int SNAKE_INIT_POSITION_X = 8;
@@ -37,12 +41,13 @@ public class GameManager {
     private int speed; // 速度
     private boolean isRunning;
     private GameStatus gameStatus; // 游戏状态
-    private Button startGameButton; // 开始游戏按钮
-    private Button restartGameButton; // 开始游戏按钮
+    private final Button startGameButton; // 开始游戏按钮
+    private final Button restartGameButton; // 开始游戏按钮
     private int currentSelectButton;
     private Snake snake; // 蛇
     private Food food; // 食物
-    private Drawer drawer;
+    private final Drawer drawer;
+    private final InputManager inputManager;
     private final List<UI> uis = new ArrayList<>();
 
     // jline库中的输入控制的类
@@ -53,11 +58,10 @@ public class GameManager {
         this.row = row;
         this.col = col;
 
-
-
-
         // 渲染器对象
         drawer = new Drawer();
+        // 输入管理器
+        inputManager = new InputManager();
         // 创建UI对象
         uis.add(new Map(this.row,this.col));
         uis.add(new Menu(this.row+ROW_COUNT,this.col,ROW_COUNT));
@@ -105,6 +109,7 @@ public class GameManager {
     private void init(){
         initData();
         initUI();
+        initInput();
         // 初始化蛇的位置
         initSnake();
         // 初始化食物的位置
@@ -162,6 +167,15 @@ public class GameManager {
     }
 
     /**
+     * 初始化输入
+     */
+    private void initInput(){
+        inputManager.register("move",new MoveKeyListener(this));
+        inputManager.register("menu",new MenuKeyListener(this));
+        inputManager.register("game",new GameKeyListener(this));
+    }
+
+    /**
      * 初始化蛇
      */
     private void initSnake(){
@@ -208,20 +222,16 @@ public class GameManager {
                 gameOver();
                 return;
             }
-
             // 检查是否撞到自己
             if (snake.checkCollisionWhiSelf()) {
                 gameOver();
                 return;
             }
             snake.move();
-
             if (checkSnakeEatFood()){
                 eatFood();
             }
         }
-
-
 
     }
 
@@ -233,83 +243,7 @@ public class GameManager {
             int input = reader.read(1);
             if (input != -1){
                 char c = (char) input;
-                switch (Character.toLowerCase(c)){
-                    case 'w':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "W");
-                        if (gameStatus == GameStatus.STARTING)
-                            if (snake.getDirection() != Direction.DOWN)
-                                snake.setDirection(Direction.UP);
-                        break;
-                    case 's':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "S");
-                        if (gameStatus == GameStatus.STARTING)
-                            if (snake.getDirection() != Direction.UP)
-                                snake.setDirection(Direction.DOWN);
-                        break;
-                    case 'a':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "A");
-                        if (gameStatus == GameStatus.STARTING)
-                            if (snake.getDirection() != Direction.RIGHT)
-                                snake.setDirection(Direction.LEFT);
-                        break;
-                    case 'd':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "D");
-                        if (gameStatus == GameStatus.STARTING)
-                            if (snake.getDirection() != Direction.LEFT)
-                                snake.setDirection(Direction.RIGHT);
-                        break;
-                    case '1':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "1");
-                        if (gameStatus == GameStatus.MENU ){
-                            // 检查startGameButton是否启用
-                            if (startGameButton.isEnable()){
-                                currentSelectButton = 1;
-                                startGameButton.onSelect();
-                                restartGameButton.onDeselect();
-                            } else {
-                                currentSelectButton = 2;
-                                restartGameButton.onSelect();
-                                startGameButton.onDeselect();
-                            }
-
-                        }
-                        break;
-                    case '2':
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE,"2");
-                        if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
-                            // 检查restartGameButton是否启用
-                            if (restartGameButton.isEnable()){
-                                currentSelectButton = 2;
-                                startGameButton.onDeselect();
-                                restartGameButton.onSelect();
-                            } else {
-                                currentSelectButton = 1;
-                                startGameButton.onSelect();
-                                restartGameButton.onDeselect();
-                            }
-
-                        }
-                        break;
-                    case 13: // 回车键
-                        drawer.drawText(row+6,25*2,ForeColor.WHITE, "↵");
-                        Logger.warn("当前选择的按钮为 "+currentSelectButton);
-                        if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
-                            if (currentSelectButton == 1){
-                                // 开始游戏被选择确定后，把游戏状态设置为开始状态
-                                gameStatus = GameStatus.STARTING;
-                            } else if (currentSelectButton == 2) {
-                                Logger.info("重新开始游戏");
-                                restartGame();
-                            }
-                        }
-                        break;
-                    case 27:
-                        if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
-                            isRunning = false;
-                        }
-                    default:
-                        break;
-                }
+                inputManager.handler(c);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -348,8 +282,6 @@ public class GameManager {
             food.draw();
 
         }
-
-
     }
 
     /**
@@ -361,6 +293,7 @@ public class GameManager {
         // 显示光标
         Terminal.showCursor();
 
+        inputManager.clean();
     }
 
     /**
@@ -466,7 +399,7 @@ public class GameManager {
     /**
      * 游戏结束
      */
-    private void gameOver(){
+    public void gameOver(){
         // 游戏状态设置为游戏结束
         gameStatus = GameStatus.GAME_OVER;
         restartGameButton.setEnable(true);
@@ -479,7 +412,7 @@ public class GameManager {
     /**
      * 重新游戏
      */
-    private void restartGame(){
+    public void restartGame(){
         this.score = 0;
         this.length = 3;
         Map map = null;
@@ -504,4 +437,47 @@ public class GameManager {
 
     }
 
+    public Drawer getDrawer(){
+        return drawer;
+    }
+
+    public int getRow(){
+        return row;
+    }
+
+    public int getCol(){
+        return col;
+    }
+
+    public GameStatus getGameStatus(){
+        return gameStatus;
+    }
+
+    public void setGameStatus(GameStatus gameStatus){
+        this.gameStatus = gameStatus;
+    }
+
+    public Snake getSnake(){
+        return snake;
+    }
+
+    public int getCurrentSelectButton(){
+        return currentSelectButton;
+    }
+
+    public Button getStartGameButton(){
+        return startGameButton;
+    }
+
+    public Button getRestartGameButton(){
+        return restartGameButton;
+    }
+
+    public void setCurrentSelectButton(int value){
+        this.currentSelectButton = value;
+    }
+
+    public void setRunning(boolean flag){
+        this.isRunning = flag;
+    }
 }
