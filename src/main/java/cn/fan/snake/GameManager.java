@@ -23,6 +23,7 @@ import org.jline.utils.NonBlockingReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * 游戏管理类
@@ -90,12 +91,33 @@ public class GameManager {
         // 游戏初始化
         init();
 
+        long lastUpdateTime = System.currentTimeMillis();
+        long updateInterval = 1000 / speed; // 根据速度来计算更新间隔时间（毫秒）
+
         // 游戏主循环
         while (isRunning){
+            long currentTime = System.currentTimeMillis();
+            long elapsedTime = currentTime - lastUpdateTime;
 
             processInput();
-            update();
+            // 只有当经过足够的时间才更新游戏
+            if (elapsedTime >= updateInterval){
+                update();
+                lastUpdateTime = currentTime; // 重置上次更新时间
+            }
             render();
+
+
+//            try {
+////                String osName = System.getProperty("os.name").toLowerCase();
+////                if (osName.contains("windows")){
+//                Thread.sleep(5);
+////                } else {
+////                    Thread.sleep(10);
+////                }
+//            } catch (InterruptedException e){
+//                e.printStackTrace();
+//            }
 
         }
         // 游戏循环结束
@@ -121,7 +143,7 @@ public class GameManager {
         this.score = 0;
         this.length = snake.getLength();
         this.isRunning = true; // 游戏循环是否运行
-        this.speed = 100;
+        this.speed = 5;
         this.gameStatus = GameStatus.MENU; // 初始化游戏状态
         // 默认选择开始游戏按钮
         currentSelectButton = 1;
