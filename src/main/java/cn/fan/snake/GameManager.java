@@ -92,10 +92,8 @@ public class GameManager {
             render();
 
         }
-        // 游戏结束
-        if (!isRunning){
-
-        }
+        // 游戏循环结束
+        stop();
         cleanup();
     }
 
@@ -292,7 +290,7 @@ public class GameManager {
 
                         }
                         break;
-                    case 13:
+                    case 13: // 回车键
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "↵");
                         Logger.warn("当前选择的按钮为 "+currentSelectButton);
                         if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
@@ -305,6 +303,10 @@ public class GameManager {
                             }
                         }
                         break;
+                    case 27:
+                        if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
+                            isRunning = false;
+                        }
                     default:
                         break;
                 }
@@ -319,13 +321,13 @@ public class GameManager {
      */
     public void render(){
         // 得分、长度、fps数值动态渲染
-        String score = String.format("%d",this.score);
+        String score = String.format("%3d",this.score);
         drawer.drawText(row+2,25*2,ForeColor.WHITE, score);
 
-        String length = String.format("%d",this.length);
+        String length = String.format("%3d",this.length);
         drawer.drawText(row+4, 25*2,ForeColor.WHITE,length);
 
-        String fps = String.format("%d",this.speed);
+        String fps = String.format("%3d",this.speed);
         drawer.drawText(row+8,25*2,ForeColor.WHITE,fps);
 
         // 如果游戏状态在菜单，去动态实时渲染按钮
@@ -350,7 +352,16 @@ public class GameManager {
 
     }
 
+    /**
+     * 游戏循环结束
+     */
+    private void stop(){
+        // 清理终端
+        Terminal.cleanScreen();
+        // 显示光标
+        Terminal.showCursor();
 
+    }
 
     /**
      * 清理终端输入
@@ -387,9 +398,9 @@ public class GameManager {
         do {
             // 生成食物随机位置
             // x是 3 ~ 29 之间生成
-            // y是 2 ～ 29 之间生成
+            // y是 2 ～ 27 之间生成  (PS：在底部边框刷新食物，可能出现bug，懒得修，直接在2～27以上生成）
             foodX = random.nextInt( 29 - 3 + 1) + 3;
-            foodY = random.nextInt(28 - 2 + 1) + 2;
+            foodY = random.nextInt(27 - 2 + 1) + 2;
 
             // 检查位置是否有效（不在蛇身上）
             validPosition = true;
@@ -470,7 +481,7 @@ public class GameManager {
      */
     private void restartGame(){
         this.score = 0;
-
+        this.length = 3;
         Map map = null;
         Menu menu = null;
         for (UI ui : uis){
