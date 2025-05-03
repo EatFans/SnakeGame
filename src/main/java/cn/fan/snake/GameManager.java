@@ -39,7 +39,7 @@ public class GameManager {
     private int length; // 当前蛇的长度
     private final int SNAKE_INIT_POSITION_X = 8;
     private final int SNAKE_INIT_POSITION_Y = 16;
-    private int speed; // 速度
+    private int speed; // 速度, 如果这里是2，就是每秒移动两格
     private boolean isRunning;
     private GameStatus gameStatus; // 游戏状态
     private final Button startGameButton; // 开始游戏按钮
@@ -92,12 +92,17 @@ public class GameManager {
         init();
 
         long lastUpdateTime = System.currentTimeMillis();
-        long updateInterval = 1000 / speed; // 根据速度来计算更新间隔时间（毫秒）
+        long updateInterval = 1000 / this.speed; // 根据速度来计算更新间隔时间（毫秒）
 
         // 游戏主循环
         while (isRunning){
             long currentTime = System.currentTimeMillis();
             long elapsedTime = currentTime - lastUpdateTime;
+
+            // 重新计算updateInterval更新间隔
+            updateInterval = 1000 / this.speed;
+
+//            Logger.info("e:"+elapsedTime + ", interval:" + updateInterval + ", speed:" + this.speed); // 测试日志打印
 
             processInput();
             // 只有当经过足够的时间才更新游戏
@@ -335,6 +340,14 @@ public class GameManager {
      */
     private void eatFood(){
         score += 10; // 吃到就加10分
+
+        // 平滑增加速度额，每得40分就提高一点速度，最高25
+        int newSpeed = 5 + (score / 40);
+        if (newSpeed > 25){
+            newSpeed = 25;
+        }
+        this.speed = newSpeed;
+
         // 删除就的食物
         Position oldFoodPosition = food.getPosition();
         drawer.draw(oldFoodPosition.getX(),oldFoodPosition.getY(),"　");
@@ -437,6 +450,7 @@ public class GameManager {
     public void restartGame(){
         this.score = 0;
         this.length = 3;
+        this.speed = 2;
         Map map = null;
         Menu menu = null;
         for (UI ui : uis){
@@ -502,4 +516,6 @@ public class GameManager {
     public void setRunning(boolean flag){
         this.isRunning = flag;
     }
+
+
 }
