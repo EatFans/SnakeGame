@@ -3,6 +3,7 @@ package cn.fan.snake;
 import cn.fan.snake.engine.Drawer;
 import cn.fan.snake.engine.Logger;
 import cn.fan.snake.engine.ansi.BackColor;
+import cn.fan.snake.entity.Food;
 import cn.fan.snake.entity.Snake;
 import cn.fan.snake.ui.Button;
 import cn.fan.snake.ui.Map;
@@ -15,6 +16,7 @@ import org.jline.utils.NonBlockingReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 游戏管理类
@@ -30,14 +32,14 @@ public class GameManager {
     private int length; // 当前蛇的长度
     private final int SNAKE_INIT_POSITION_X = 8;
     private final int SNAKE_INIT_POSITION_Y = 16;
-    private int currentFPS; // 当前fps
+    private int speed; // 速度
     private boolean isRunning;
     private GameStatus gameStatus; // 游戏状态
     private Button startGameButton; // 开始游戏按钮
     private Button restartGameButton; // 开始游戏按钮
     private int currentSelectButton;
     private Snake snake; // 蛇
-
+    private Food food; // 食物
     private Drawer drawer;
     private final List<UI> uis = new ArrayList<>();
 
@@ -50,6 +52,8 @@ public class GameManager {
         this.col = col;
 
 
+
+
         // 渲染器对象
         drawer = new Drawer();
         // 创建UI对象
@@ -60,6 +64,8 @@ public class GameManager {
         restartGameButton = new Button(this.row+6,13*2,"重新开始");
         // 创建蛇的对象
         snake = new Snake();
+        // 创建蛇对象
+        food = new Food();
         try {
             // 初始化终端
             terminal = TerminalBuilder.builder()
@@ -110,7 +116,7 @@ public class GameManager {
         this.score = 0;
         this.length = snake.getLength();
         this.isRunning = true; // 游戏循环是否运行
-        this.currentFPS = 0;
+        this.speed = 100;
         this.gameStatus = GameStatus.MENU; // 初始化游戏状态
         // 默认选择开始游戏按钮
         currentSelectButton = 1;
@@ -129,6 +135,7 @@ public class GameManager {
         startGameButton.setDrawer(this.drawer);
         restartGameButton.setDrawer(this.drawer);
         snake.setDrawer(this.drawer);
+        food.setDrawer(this.drawer);
 
         Map map = null;
         Menu menu = null;
@@ -158,6 +165,8 @@ public class GameManager {
      * 初始化蛇
      */
     private void initSnake(){
+        length = 3;
+        snake.clear();
         snake.init(SNAKE_INIT_POSITION_X,SNAKE_INIT_POSITION_Y);
         // 渲染蛇
         List<Position> body = snake.getBody();
@@ -175,14 +184,19 @@ public class GameManager {
 
     }
 
+    /**
+     * 初始化食物
+     */
     private void initFood(){
-
+        food.draw();
     }
 
     /**
      * 更新逻辑
      */
     public void update(){
+        length = snake.getLength();
+
         if (gameStatus == GameStatus.STARTING){
             // 获取蛇头的当前位置
             Position head = snake.getHead();
@@ -201,6 +215,10 @@ public class GameManager {
                 return;
             }
             snake.move();
+
+            if (checkSnakeEatFood()){
+                eatFood();
+            }
         }
 
 
@@ -277,12 +295,14 @@ public class GameManager {
                     case 13:
                         drawer.drawText(row+6,25*2,ForeColor.WHITE, "↵");
                         Logger.warn("当前选择的按钮为 "+currentSelectButton);
-                        if (currentSelectButton == 1){
-                            // 开始游戏被选择确定后，把游戏状态设置为开始状态
-                            gameStatus = GameStatus.STARTING;
-                        } else if (currentSelectButton == 2) {
-                            Logger.info("重新开始游戏");
-                            restartGame();
+                        if (gameStatus == GameStatus.MENU || gameStatus == GameStatus.GAME_OVER){
+                            if (currentSelectButton == 1){
+                                // 开始游戏被选择确定后，把游戏状态设置为开始状态
+                                gameStatus = GameStatus.STARTING;
+                            } else if (currentSelectButton == 2) {
+                                Logger.info("重新开始游戏");
+                                restartGame();
+                            }
                         }
                         break;
                     default:
@@ -305,7 +325,7 @@ public class GameManager {
         String length = String.format("%d",this.length);
         drawer.drawText(row+4, 25*2,ForeColor.WHITE,length);
 
-        String fps = String.format("%d",this.currentFPS);
+        String fps = String.format("%d",this.speed);
         drawer.drawText(row+8,25*2,ForeColor.WHITE,fps);
 
         // 如果游戏状态在菜单，去动态实时渲染按钮
@@ -314,13 +334,20 @@ public class GameManager {
             restartGameButton.draw();
         }
 
-        // 渲染蛇
         if (gameStatus == GameStatus.STARTING){
+
+            // 渲染蛇
             // 如果是蛇头位置处于边界上就不渲染
             Position head = snake.getHead();
             if (!isOnBorder(head))
                 snake.draw();
+
+            // 渲染食物
+            food.draw();
+
         }
+
+
     }
 
 
@@ -335,6 +362,46 @@ public class GameManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 吃到食物
+     */
+    private void eatFood(){
+        score += 10; // 吃到就加10分
+        // 删除就的食物
+        Position oldFoodPosition = food.getPosition();
+        drawer.draw(oldFoodPosition.getX(),oldFoodPosition.getY(),"　");
+        // 生成新的食物
+        generateFood();
+        snake.grow(); // 蛇生长一节
+    }
+
+    /**
+     * 生成食物
+     */
+    private void generateFood(){
+        Random random = new Random();
+        int foodX, foodY;
+        boolean validPosition;
+        do {
+            // 生成食物随机位置
+            // x是 3 ~ 29 之间生成
+            // y是 2 ～ 29 之间生成
+            foodX = random.nextInt( 29 - 3 + 1) + 3;
+            foodY = random.nextInt(28 - 2 + 1) + 2;
+
+            // 检查位置是否有效（不在蛇身上）
+            validPosition = true;
+            for (Position segment : snake.getBody()) {
+                if (segment.getX() == foodX && segment.getY() == foodY) {
+                    validPosition = false;
+                    break;
+                }
+            }
+        } while (!validPosition);
+        // 设置食物位置
+        food.setPosition(foodX, foodY);
     }
 
     /**
@@ -364,6 +431,17 @@ public class GameManager {
     }
 
     /**
+     * 检查是否吃到食物
+     * @return 如果吃到食物就返回true，否则就返回false
+     */
+    private boolean checkSnakeEatFood(){
+        Position foodPosition = food.getPosition();
+        Position head = snake.getHead();
+
+        return head.getX() == foodPosition.getX() && head.getY() == foodPosition.getY();
+    }
+
+    /**
      * 检查指定位置是否撞到地图边界
      */
     private boolean checkCollisionWithBoundary(Position position) {
@@ -374,6 +452,9 @@ public class GameManager {
         return row <= 0 || row >= this.row - 1 || col <= 0 || col >= this.col - 1;
     }
 
+    /**
+     * 游戏结束
+     */
     private void gameOver(){
         // 游戏状态设置为游戏结束
         gameStatus = GameStatus.GAME_OVER;
@@ -398,16 +479,16 @@ public class GameManager {
             if (ui instanceof Menu)
                 menu = (Menu) ui;
         }
-
+        // 为防止UI被破坏，重新再渲染绘制一遍UI
         map.draw();
         menu.draw();
-
         // 清理游戏区域渲染
         drawer.clearDraw(2,3,this.row-1,this.col-2);
-
+        // 初始化蛇、生成食物
         initSnake();
-
-        // TODO: 待完成
+        generateFood();
+        // 将游戏状态设置为STARTING
+        gameStatus = GameStatus.STARTING;
 
 
     }

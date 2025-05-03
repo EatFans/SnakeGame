@@ -233,4 +233,12 @@ public class Snake extends Entity {
         }
     }
 
+    /**
+     * 清理
+     */
+    public void clear(){
+        body.clear();
+        length = DEFAULT_LENGTH;
+    }
+
 }

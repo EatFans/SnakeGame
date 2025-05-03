@@ -27,6 +27,8 @@ public class Map extends UI {
                 }
             }
         }
+//        Logger.info("x ： "+ col / 2);
+//        Logger.info("y : " + row);
     }
 
 }

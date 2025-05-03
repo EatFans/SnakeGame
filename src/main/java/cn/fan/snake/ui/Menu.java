@@ -33,7 +33,7 @@ public class Menu extends UI{
         }
         // 菜单文本绘制
         drawer.drawText(realRow+2,3*2,ForeColor.WHITE,"使用w、s、a、d控制，1、2选择按钮");
-        drawer.drawText(realRow+3,3*2,ForeColor.WHITE,"enter确定选择");
+        drawer.drawText(realRow+3,3*2,ForeColor.WHITE,"enter确定选择，esc键结束退出游戏");
         drawer.drawText(realRow+2,22*2,ForeColor.YELLOW,"得分：");
         drawer.drawText(realRow+4,22*2,ForeColor.GREEN,"长度：");
         drawer.drawText(realRow+6,22*2,ForeColor.PURPLE,"输入：");
